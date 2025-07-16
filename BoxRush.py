@@ -33,6 +33,8 @@ player_y = HEIGHT - 100
 player_vel_y = 0  # Vertical velocity for jumping and falling
 alive = True
 game_started = False
+start_time = 0
+elapsed_time = 0
 
 # Ground properties
 GROUND_HEIGHT = 50
@@ -79,7 +81,8 @@ jump_cooldown = 0.2  # Minimum seconds between jumps
 
 def reset_game():
     """Reset game state to initial conditions for restarting."""
-    global player_y, player_vel_y, alive, platforms, obstacles, coins, score, jump_count, on_ground, game_started
+    global player_y, player_vel_y, alive, platforms, obstacles, coins, score, jump_count, on_ground, game_started, elapsed_time
+    elapsed_time = 0
     player_y = GROUND_Y - player_size
     player_vel_y = 0
     alive = True
@@ -110,13 +113,14 @@ def reset_game():
 
 def start_game():
     """Initialize variables to start the game."""
-    global game_started, alive, player_y, player_vel_y, jump_count, on_ground
+    global game_started, alive, player_y, player_vel_y, jump_count, on_ground, start_time
     game_started = True
     alive = True
     player_y = GROUND_Y - player_size
     player_vel_y = 0
     jump_count = 0
     on_ground = True
+    start_time = time.time()
     print("Game Started")
 
 
@@ -179,6 +183,8 @@ while True:
 
         on_ground = False  # Reset on_ground each frame
 
+        elapsed_time = time.time() - start_time
+
         # Move platforms left; reposition if offscreen
         for plat in platforms:
             plat.x -= SCROLL_SPEED
@@ -227,7 +233,9 @@ while True:
         for obs in obstacles:
             if player_rect.colliderect(obs):
                 alive = False
-                print("You Died! Press R or Y on Controller to Restart.")
+                print("You Died!")
+                print ("You survived for", {int(elapsed_time)} ,"seconds and earned", score, "coins")
+                print ("Press R or Y on Controller to Restart.")
 
         # Check if player collected any coins, increment score and respawn coin
         for coin in coins:
@@ -266,6 +274,10 @@ while True:
     score_text = font.render(f"Coins: {score}", True, BLACK)
     screen.blit(score_text, (10, 10))
 
+    #Display elapsed time
+    timer_text = font.render (f"Time: {int(elapsed_time)}s", True, BLACK)
+    screen.blit(timer_text, (10,40))
+
     # Draw start message if game hasn't started yet
     if not game_started:
         start_text = font.render("Press SPACE or A to Start", True, BLACK)
@@ -277,6 +289,12 @@ while True:
         game_over_text = font.render("GAME OVER! Press Y or R to Restart", True, RED)
         over_rect = game_over_text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
         screen.blit(game_over_text, over_rect)
+        results_text = font.render(
+            f"You survived for {int(elapsed_time)} seconds and earned {score} coins", 
+            True, BLUE
+            )
+        results_rect = results_text.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 40))
+        screen.blit(results_text, results_rect)
 
     # Draw exit instruction text at bottom-right corner (red color)
     exit_text = font.render("Press B or ESC to Exit", True, RED)
