@@ -6,6 +6,8 @@ import time
 # Initialize pygame modules
 pygame.init()
 
+pygame.mixer.init()
+coin_sound = pygame.mixer.Sound('audio/coin_collect.wav')
 # Set screen dimensions and create display
 WIDTH, HEIGHT = 800, 600
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -242,6 +244,7 @@ while True:
         for coin in coins:
             if player_rect.colliderect(coin):
                 score += 1
+                coin_sound.play()
                 # Respawn coin offscreen at random platform or ground height
                 coin.x = WIDTH + random.randint(300, 600)
                 platform_tops = [GROUND_Y] + [plat.top for plat in platforms]
