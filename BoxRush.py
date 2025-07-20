@@ -208,16 +208,17 @@ while True:
                 chosen_top = random.choice(platform_tops)
                 coin.y = chosen_top - coin.height  # position coin on top
 
-        # Check collision with platforms to land and reset jump count
         for plat in platforms:
-            # Collision only counts if player is falling onto platform from above
             if player_rect.colliderect(plat):
                 if player_vel_y > 0 and player_rect.bottom - player_vel_y <= plat.top + 5:
-                    player_y = plat.top - player_size  # Align player on platform top
+                    player_y = plat.top - player_size
                     player_vel_y = 0
                     on_ground = True
                     jump_count = 0
                     break
+                elif player_vel_y < 0 and player_rect.top - player_vel_y >= plat.bottom - 5:
+                    player_y = plat.bottom
+                    player_vel_y = 0
 
         # Check collision with ground (if not on platform)
         if not on_ground and player_y + player_size >= GROUND_Y:
